@@ -81,23 +81,42 @@ walls = [
 
 ]
 
+pygame.font.init()
+font = pygame.font.Font(None, 70)
+text_win = font.render("you won", True, (255,215,0), (0,0,0))
+text_lose = font.render("you lost", True, (255,0,0), (0,0,0))
+
+#money_sound = pygame.mixer.Sound("money.ogg")
+#kick_sound = pygame.mixer.Sound("kick.ogg")
 
 game_over = False
+finish = False
 while not game_over:
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             game_over = True
 
+    if not finish:
+        window.blit(background, (0,0))
+        player.update()
+        player.reset()
+        enemy.update(WIDTH/2,WIDTH)
+        enemy.reset()
+        gold.reset()
 
-    window.blit(background, (0,0))
-    player.update()
-    player.reset()
-    enemy.update(WIDTH/2,WIDTH)
-    enemy.reset()
-    gold.reset()
+        for w in walls:
+            w.draw_wall()
 
-    for w in walls:
-        w.draw_wall()
+        if pygame.sprite.collide_rect(player, gold):
+            finish = True
+            window.blit(text_win, (WIDTH/2-100, HEIGHT/2-20))
+            #money_sound.play()
+
+        wall_collision = any([pygame.sprite.collide_rect(player, w) for w in walls])
+
+
+        if pygame.sprite.collide_rect(player, enemy) or wall_collision:
+            finish = True
 
     pygame.display.update()
     clock.tick(FPS)
